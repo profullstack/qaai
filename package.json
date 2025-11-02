@@ -8,8 +8,10 @@
     "dev:runner": "pnpm --filter runner dev",
     "build:web": "pnpm --filter web build",
     "build:runner": "pnpm --filter runner build",
+    "build": "pnpm build:web",
     "start:web": "pnpm --filter web start",
     "start:runner": "pnpm --filter runner start",
+    "start": "pnpm start:web",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
     "format": "prettier --write \"**/*.{js,json,md}\""
