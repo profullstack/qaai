@@ -1,95 +1,100 @@
 /**
- * Playwright Configuration for QAAI Runner
+ * Playwright Configuration
  * 
- * This configuration is used by the runner service to execute
- * generated E2E tests with proper settings for CI/CD environments.
+ * Enhanced configuration with retry and timeout settings.
  */
 
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
-export default defineConfig({
-  // Test timeout (60 seconds)
-  timeout: 60_000,
+/**
+ * Read environment variables for configuration
+ */
+const config = {
+  // Test directory
+  testDir: './tests',
   
-  // Retry failed tests once
-  retries: 1,
+  // Maximum time one test can run
+  timeout: parseInt(process.env.TEST_TIMEOUT || '30000', 10),
   
-  // Run tests in parallel
-  workers: process.env.RUNNER_CONCURRENCY 
-    ? parseInt(process.env.RUNNER_CONCURRENCY, 10) 
-    : 3,
+  // Test execution settings
+  fullyParallel: process.env.PARALLEL === 'true',
+  forbidOnly: !!process.env.CI,
+  
+  // Retry configuration
+  retries: parseInt(process.env.TEST_RETRIES || '2', 10),
+  
+  // Number of workers
+  workers: process.env.CI ? 1 : undefined,
   
   // Reporter configuration
   reporter: [
     ['list'],
-    ['junit', { outputFile: 'results/junit.xml' }],
-    ['html', { outputFolder: 'results/html', open: 'never' }],
+    ['junit', { outputFile: 'test-results/results.xml' }],
+    ['html', { outputFolder: 'test-results/html', open: 'never' }],
   ],
   
-  // Global test configuration
+  // Shared settings for all projects
   use: {
-    // Run in headless mode (can be overridden)
-    headless: process.env.PLAYWRIGHT_HEADLESS !== 'false',
+    // Base URL
+    baseURL: process.env.BASE_URL || 'http://localhost:3000',
     
-    // Capture trace on first retry
-    trace: 'on-first-retry',
+    // Collect trace on failure
+    trace: process.env.TRACE || 'on-first-retry',
     
-    // Capture video on failure
-    video: 'retain-on-failure',
+    // Screenshot on failure
+    screenshot: process.env.SCREENSHOT || 'only-on-failure',
     
-    // Capture screenshot on failure
-    screenshot: 'only-on-failure',
-    
-    // Base URL for tests
-    baseURL: process.env.APP_BASE_URL || process.env.APP_BASE_URL_DEFAULT || 'http://localhost:3000',
-    
-    // Browser viewport
-    viewport: { width: 1280, height: 720 },
-    
-    // Ignore HTTPS errors (for local development)
-    ignoreHTTPSErrors: true,
+    // Video on failure
+    video: process.env.VIDEO || 'retain-on-failure',
     
     // Action timeout
-    actionTimeout: 10_000,
+    actionTimeout: parseInt(process.env.ACTION_TIMEOUT || '10000', 10),
     
     // Navigation timeout
-    navigationTimeout: 30_000,
+    navigationTimeout: parseInt(process.env.NAVIGATION_TIMEOUT || '30000', 10),
+    
+    // Ignore HTTPS errors
+    ignoreHTTPSErrors: process.env.IGNORE_HTTPS_ERRORS === 'true',
+    
+    // Viewport size
+    viewport: { 
+      width: parseInt(process.env.VIEWPORT_WIDTH || '1280', 10),
+      height: parseInt(process.env.VIEWPORT_HEIGHT || '720', 10)
+    },
   },
   
-  // Test directory
-  testDir: '../../packages/playwright-tests',
-  
-  // Output directory for test artifacts
-  outputDir: 'results/test-results',
-  
-  // Projects for different browsers (start with Chromium only)
+  // Configure projects for major browsers
   projects: [
     {
       name: 'chromium',
-      use: {
-        browserName: 'chromium',
-      },
+      use: { ...devices['Desktop Chrome'] },
     },
-    // Uncomment to add more browsers
-    // {
-    //   name: 'firefox',
-    //   use: {
-    //     browserName: 'firefox',
-    //   },
-    // },
-    // {
-    //   name: 'webkit',
-    //   use: {
-    //     browserName: 'webkit',
-    //   },
-    // },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+    },
+    // Mobile viewports
+    {
+      name: 'Mobile Chrome',
+      use: { ...devices['Pixel 5'] },
+    },
+    {
+      name: 'Mobile Safari',
+      use: { ...devices['iPhone 12'] },
+    },
   ],
   
-  // Web server configuration (if needed for local testing)
-  // webServer: {
-  //   command: 'npm run start',
-  //   port: 3000,
-  //   timeout: 120_000,
-  //   reuseExistingServer: !process.env.CI,
-  // },
-});
+  // Web server configuration
+  webServer: process.env.START_SERVER === 'true' ? {
+    command: 'npm run dev',
+    url: process.env.BASE_URL || 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+  } : undefined,
+};
+
+export default defineConfig(config);

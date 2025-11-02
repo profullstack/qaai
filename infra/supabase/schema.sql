@@ -40,6 +40,11 @@ create table projects (
   issue_labels text[] default array['qa-automated', 'bug'],
   -- Authentication configuration for testing
   auth_config jsonb default '{}'::jsonb,
+  -- Route coverage tracking
+  routes jsonb default '[]'::jsonb,
+  critical_paths text[] default array['/api/auth', '/api/payment', '/api/users'],
+  -- Test configuration
+  test_config jsonb default '{}'::jsonb,
   created_at timestamptz default now()
 );
 
@@ -147,9 +152,12 @@ create table github_issues (
   id uuid primary key default gen_random_uuid(),
   run_test_id uuid references run_tests(id) on delete cascade,
   project_id uuid references projects(id) on delete cascade,
+  run_id uuid references runs(id) on delete cascade,
   issue_number int not null,
   issue_url text not null,
-  issue_title text not null,
+  title text not null,
+  issue_type text check (issue_type in ('test_failure','flaky_test','multiple_failures','manual')) default 'manual',
+  metadata jsonb default '{}'::jsonb,
   created_by uuid,
   created_at timestamptz default now()
 );
