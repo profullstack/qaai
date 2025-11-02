@@ -1,0 +1,19 @@
+{
+  "name": "runner",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js",
+    "test": "echo \"Tests to be implemented\""
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "@playwright/test": "^1.48.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

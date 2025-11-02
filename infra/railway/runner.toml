@@ -1,0 +1,27 @@
+# Railway Configuration for QAAI Runner Service
+# This service runs as a Docker container with Playwright
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "services/runner/Dockerfile"
+
+[deploy]
+startCommand = "node services/runner/index.js"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+# Health check (optional - runner doesn't expose HTTP)
+# healthcheckPath = "/health"
+# healthcheckTimeout = 100
+
+[env]
+# These will be set in Railway dashboard
+# SUPABASE_URL = 
+# SUPABASE_SERVICE_ROLE_KEY = 
+# RUNNER_CONCURRENCY = 3
+# RUNNER_POLL_INTERVAL_MS = 3000
+# PLAYWRIGHT_HEADLESS = true
+# APP_BASE_URL_DEFAULT = http://host.docker.internal:3000
+# LLM_PROVIDER = openai
+# OPENAI_API_KEY = 
+# OPENAI_MODEL = gpt-4o-mini

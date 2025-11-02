@@ -1,0 +1,13 @@
+# Generated Playwright test files
+*.spec.js
+*.test.js
+
+# Test results
+results/
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Keep the directory structure
+!.gitignore
+!README.md
