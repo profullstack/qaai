@@ -14,6 +14,8 @@ alter table plans enable row level security;
 alter table runs enable row level security;
 alter table run_tests enable row level security;
 alter table github_issues enable row level security;
+alter table test_users enable row level security;
+alter table test_headers enable row level security;
 
 -- Note: jobs_queue does not need RLS as it's only accessed by service role
 
@@ -442,13 +444,109 @@ create policy "github_issues_update"
   );
 
 -- Members can delete GitHub issues
-create policy "github_issues_delete" 
+create policy "github_issues_delete"
   on github_issues for delete
   using (
     exists (
       select 1 from projects p
       join org_members m on m.org_id = p.org_id
       where p.id = github_issues.project_id and m.user_id = auth.uid()
+    )
+  );
+
+-- ============================================================================
+-- TEST_USERS POLICIES
+-- ============================================================================
+
+-- Users can see test users in their organization's projects
+create policy "test_users_select"
+  on test_users for select
+  using (
+    exists (
+      select 1 from projects p
+      join org_members m on m.org_id = p.org_id
+      where p.id = test_users.project_id and m.user_id = auth.uid()
+    )
+  );
+
+-- Members can create test users
+create policy "test_users_insert"
+  on test_users for insert
+  with check (
+    exists (
+      select 1 from projects p
+      join org_members m on m.org_id = p.org_id
+      where p.id = test_users.project_id and m.user_id = auth.uid()
+    )
+  );
+
+-- Members can update test users
+create policy "test_users_update"
+  on test_users for update
+  using (
+    exists (
+      select 1 from projects p
+      join org_members m on m.org_id = p.org_id
+      where p.id = test_users.project_id and m.user_id = auth.uid()
+    )
+  );
+
+-- Members can delete test users
+create policy "test_users_delete"
+  on test_users for delete
+  using (
+    exists (
+      select 1 from projects p
+      join org_members m on m.org_id = p.org_id
+      where p.id = test_users.project_id and m.user_id = auth.uid()
+    )
+  );
+
+-- ============================================================================
+-- TEST_HEADERS POLICIES
+-- ============================================================================
+
+-- Users can see test headers in their organization's projects
+create policy "test_headers_select"
+  on test_headers for select
+  using (
+    exists (
+      select 1 from projects p
+      join org_members m on m.org_id = p.org_id
+      where p.id = test_headers.project_id and m.user_id = auth.uid()
+    )
+  );
+
+-- Members can create test headers
+create policy "test_headers_insert"
+  on test_headers for insert
+  with check (
+    exists (
+      select 1 from projects p
+      join org_members m on m.org_id = p.org_id
+      where p.id = test_headers.project_id and m.user_id = auth.uid()
+    )
+  );
+
+-- Members can update test headers
+create policy "test_headers_update"
+  on test_headers for update
+  using (
+    exists (
+      select 1 from projects p
+      join org_members m on m.org_id = p.org_id
+      where p.id = test_headers.project_id and m.user_id = auth.uid()
+    )
+  );
+
+-- Members can delete test headers
+create policy "test_headers_delete"
+  on test_headers for delete
+  using (
+    exists (
+      select 1 from projects p
+      join org_members m on m.org_id = p.org_id
+      where p.id = test_headers.project_id and m.user_id = auth.uid()
     )
   );
 

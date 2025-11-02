@@ -38,6 +38,31 @@ create table projects (
   github_repo_name text,
   auto_create_issues boolean default false,
   issue_labels text[] default array['qa-automated', 'bug'],
+  -- Authentication configuration for testing
+  auth_config jsonb default '{}'::jsonb,
+  created_at timestamptz default now()
+);
+
+-- Test users for authentication in E2E tests
+create table test_users (
+  id uuid primary key default gen_random_uuid(),
+  project_id uuid references projects(id) on delete cascade,
+  name text not null,
+  email text,
+  phone text,
+  password_encrypted text,
+  role text default 'user',
+  metadata jsonb default '{}'::jsonb,
+  created_at timestamptz default now()
+);
+
+-- Custom headers for test authentication
+create table test_headers (
+  id uuid primary key default gen_random_uuid(),
+  project_id uuid references projects(id) on delete cascade,
+  name text not null,
+  description text,
+  headers jsonb not null,
   created_at timestamptz default now()
 );
 
@@ -145,6 +170,8 @@ create index idx_run_tests_status on run_tests(status);
 create index idx_jobs_status on jobs_queue(status, scheduled_at);
 create index idx_github_issues_run_test on github_issues(run_test_id);
 create index idx_github_issues_project on github_issues(project_id);
+create index idx_test_users_project on test_users(project_id);
+create index idx_test_headers_project on test_headers(project_id);
 
 -- ============================================================================
 -- HELPER FUNCTIONS
@@ -259,3 +286,5 @@ comment on table runs is 'Test execution runs';
 comment on table run_tests is 'Individual test results within runs';
 comment on table jobs_queue is 'Background job queue for workers';
 comment on table github_issues is 'GitHub issues created for test failures';
+comment on table test_users is 'Test user credentials for E2E authentication';
+comment on table test_headers is 'Custom HTTP headers for test authentication';
