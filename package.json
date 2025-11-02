@@ -1,0 +1,25 @@
+{
+  "name": "qaai",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:web": "pnpm --filter web dev",
+    "dev:runner": "pnpm --filter runner dev",
+    "build:web": "pnpm --filter web build",
+    "build:runner": "pnpm --filter runner build",
+    "start:web": "pnpm --filter web start",
+    "start:runner": "pnpm --filter runner start",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "format": "prettier --write \"**/*.{js,json,md}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.1.0",
+    "eslint": "^8.55.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}
