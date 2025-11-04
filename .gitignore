@@ -15,10 +15,13 @@ dist/
 
 # Environment variables
 .env
-.env.local
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Environment config files (keep templates only)
+.env.local
+.env.prod
 
 # Debug
 npm-debug.log*

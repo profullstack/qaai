@@ -12,6 +12,8 @@
     "start:web": "pnpm --filter web start",
     "start:runner": "pnpm --filter runner start",
     "start": "pnpm start:web",
+    "env:local": "cp .env.local .env && echo '✅ Switched to local environment'",
+    "env:prod": "cp .env.prod .env && echo '✅ Switched to production environment'",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
     "format": "prettier --write \"**/*.{js,json,md}\""
